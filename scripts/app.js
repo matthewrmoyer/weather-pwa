@@ -171,6 +171,19 @@
     var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
         statement;
     // TODO add cache logic here
+    if('caches' in window){
+      caches.match(url).then(function(response){
+        if(response){
+          response.json().then(function updateFromCache(json){
+            var results = json.query.results;
+            results.key = key;
+            results.label = label;
+            results.created = json.query.created;
+            app.updateForecastCard(results)
+          })
+        }
+      })
+    }
 
     // Fetch the latest data.
     var request = new XMLHttpRequest();
@@ -289,7 +302,7 @@
         condition: {
           text: "Windy",
           date: "Thu, 21 Jul 2016 09:00 PM EDT",
-          temp: 56,
+          temp: 1000,
           code: 24
         },
         forecast: [
@@ -332,7 +345,7 @@
   // TODO add service worker code here
   if('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./service-workker.js')
+      .register('./service-worker.js')
       .then(function () {
         console.log('Service Worker Registered');
       }, function(){
