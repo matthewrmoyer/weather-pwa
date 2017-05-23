@@ -1,5 +1,7 @@
-(function() {
-  'use strict';
+$(document).ready(function(){
+
+
+
 
   var app = {
     isLoading: true,
@@ -180,25 +182,20 @@
     }
 
     // Fetch the latest data.
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-      if (request.readyState === XMLHttpRequest.DONE) {
-        if (request.status === 200) {
-          var response = JSON.parse(request.response);
-          var results = response.query.results;
-          results.key = key;
-          results.label = label;
-          results.created = response.query.created;
-          app.updateForecastCard(results);
-        }
-      } else {
-        // Return the initial weather forecast since no data is available.
-        app.updateForecastCard(initialWeatherForecast);
-      }
-    };
-    request.open('GET', url);
-    request.send();
+    $.getJSON(url, function(data){
+      console.log(data)
+      var dataToUpdate = data.query.results;
+      dataToUpdate.key = key;
+      dataToUpdate.label = label;
+      dataToUpdate.created = data.query.created;
+      console.log(dataToUpdate)
+      app.updateForecastCard(dataToUpdate);
+    })
+    .done(function(){console.log('get JSON done')})
+    .fail(function(){console.log('get JSON failed')})
   };
+
+
 
   // Iterate all of the cards and attempt to get the latest forecast data
   app.updateForecasts = function() {
@@ -375,4 +372,4 @@
 
 
 
-})();
+});
