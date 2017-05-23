@@ -53,6 +53,7 @@ $(document).ready(function(){
       key: key,
       label: label
     })
+    
     app.saveSelectedCities()
     app.toggleAddDialog(false);
   });
