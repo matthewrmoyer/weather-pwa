@@ -27,6 +27,16 @@
     daysOfWeek: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   };
 
+  localforage.setDriver([
+    localforage.INDEXEDDB,
+    localforage.WEBSQL,
+    localforage.LOCALSTORAGE
+  ])
+
+  localforage.getItem('selectedCities').then(function(readValue) {
+    console.log('Read: ', readValue);
+  });
+
 
   /*****************************************************************************
    *
@@ -51,12 +61,15 @@
     var key = selected.value;
     var label = selected.textContent;
     // TODO init the app.selectedCities array here
-    if(!app.selectedCities){
+    if (!app.selectedCities) {
       app.selectedCities = [];
     }
     app.getForecast(key, label);
     // TODO push the selected city to the array and save here
-    app.selectedCities.push({key: key, label: label})
+    app.selectedCities.push({
+      key: key,
+      label: label
+    })
     app.saveSelectedCities()
     app.toggleAddDialog(false);
   });
@@ -113,7 +126,7 @@
       if (dataLastUpdated.getTime() < cardLastUpdated.getTime()) {
         return;
       }
-    }    
+    }
     cardLastUpdatedElem.textContent = data.created;
 
     card.querySelector('.description').textContent = current.text;
@@ -169,12 +182,12 @@
   app.getForecast = function(key, label) {
     var statement = 'select * from weather.forecast where woeid=' + key;
     var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
-        statement;
+      statement;
     // TODO add cache logic here
-    if('caches' in window){
-      caches.match(url).then(function(response){
-        if(response){
-          response.json().then(function updateFromCache(json){
+    if ('caches' in window) {
+      caches.match(url).then(function(response) {
+        if (response) {
+          response.json().then(function updateFromCache(json) {
             var results = json.query.results;
             results.key = key;
             results.label = label;
@@ -215,9 +228,19 @@
   };
 
   // TODO add saveSelectedCities function here
-  app.saveSelectedCities = function () {
-    var selectedCities = JSON.stringify(app.selectedCities);
-    localStorage.selectedCities = selectedCities;
+  app.saveSelectedCities = function() {
+    // var selectedCities = JSON.stringify(app.selectedCities);
+    // localStorage.selectedCities = selectedCities;
+
+    // THIS IS WORKING RIGHT NOW WHEN ADDING
+    localforage.setItem('selectedCities', app.selectedCities, function() {
+      console.log('Using:' + localforage.driver());
+      console.log('Saved: ' + app.selectedCities);
+
+      localforage.getItem('selectedCities').then(function(readValue) {
+        console.log('Read: ', readValue);
+      });
+    })
   }
 
   app.getIconClass = function(weatherCode) {
@@ -305,15 +328,35 @@
           temp: 1000,
           code: 24
         },
-        forecast: [
-          {code: 44, high: 86, low: 70},
-          {code: 44, high: 94, low: 73},
-          {code: 4, high: 95, low: 78},
-          {code: 24, high: 75, low: 89},
-          {code: 24, high: 89, low: 77},
-          {code: 44, high: 92, low: 79},
-          {code: 44, high: 89, low: 77}
-        ]
+        forecast: [{
+          code: 44,
+          high: 86,
+          low: 70
+        }, {
+          code: 44,
+          high: 94,
+          low: 73
+        }, {
+          code: 4,
+          high: 95,
+          low: 78
+        }, {
+          code: 24,
+          high: 75,
+          low: 89
+        }, {
+          code: 24,
+          high: 89,
+          low: 77
+        }, {
+          code: 44,
+          high: 92,
+          low: 79
+        }, {
+          code: 44,
+          high: 89,
+          low: 77
+        }]
       },
       atmosphere: {
         humidity: 56
@@ -328,27 +371,41 @@
   // app.updateForecastCard(initialWeatherForecast);
 
   // TODO add startup code here
-  app.selectedCities = localStorage.selectedCities;
-  if(app.selectedCities) {
-    app.selectedCities = JSON.parse(app.selectedCities);
-    app.selectedCities.forEach(function(city){
+
+
+
+  // app.selectedCities = localStorage.selectedCities;
+  // why doesnt this work aaaahhhhh
+  localforage.getItem('selectedCities').then(function(data){
+    app.selectedCities = data;
+    console.log("app.selectedCities: ")
+    console.log(app.selectedCities)
+
+
+
+
+  if (app.selectedCities) {
+    // app.selectedCities = JSON.parse(app.selectedCities);
+    app.selectedCities.forEach(function(city) {
       app.getForecast(city.key, city.label);
     });
   } else {
-      app.updateForecastCard(initialWeatherForecast)
-      app.selectedCities = [
-        {key: initialWeatherForecast.key, label: initialWeatherForecast.label}
-      ];
-      app.saveSelectedCities()
+    app.updateForecastCard(initialWeatherForecast)
+    app.selectedCities = [{
+      key: initialWeatherForecast.key,
+      label: initialWeatherForecast.label
+    }];
+    app.saveSelectedCities()
   }
+  });
 
   // TODO add service worker code here
-  if('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('./service-worker.js')
-      .then(function () {
+      .then(function() {
         console.log('Service Worker Registered');
-      }, function(){
+      }, function() {
         console.log('Service Worker NOT Registered')
       });
   }
