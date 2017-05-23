@@ -1,18 +1,3 @@
-// Copyright 2016 Google Inc.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//      http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 (function() {
   'use strict';
 
@@ -38,12 +23,8 @@
   });
 
 
-  /*****************************************************************************
-   *
-   * Event listeners for UI elements
-   *
-   ****************************************************************************/
 
+  // Event listeners for UI elements
   document.getElementById('butRefresh').addEventListener('click', function() {
     // Refresh all of the forecasts
     app.updateForecasts();
@@ -60,12 +41,12 @@
     var selected = select.options[select.selectedIndex];
     var key = selected.value;
     var label = selected.textContent;
-    // TODO init the app.selectedCities array here
+    //init the app.selectedCities array here
     if (!app.selectedCities) {
       app.selectedCities = [];
     }
     app.getForecast(key, label);
-    // TODO push the selected city to the array and save here
+    //push the selected city to the array and save here
     app.selectedCities.push({
       key: key,
       label: label
@@ -227,18 +208,11 @@
     });
   };
 
-  // TODO add saveSelectedCities function here
+  //saveSelectedCities function
   app.saveSelectedCities = function() {
-    // var selectedCities = JSON.stringify(app.selectedCities);
-    // localStorage.selectedCities = selectedCities;
-
-    // THIS IS WORKING RIGHT NOW WHEN ADDING
     localforage.setItem('selectedCities', app.selectedCities, function() {
-      console.log('Using:' + localforage.driver());
-      console.log('Saved: ' + app.selectedCities);
-
-      localforage.getItem('selectedCities').then(function(readValue) {
-        console.log('Read: ', readValue);
+      localforage.getItem('selectedCities').then(function(savedData) {
+        console.log('Saved: ', savedData);
       });
     })
   }
@@ -367,39 +341,28 @@
       }
     }
   };
-  // TODO uncomment line below to test app with fake data
-  // app.updateForecastCard(initialWeatherForecast);
 
-  // TODO add startup code here
-
-
-
-  // app.selectedCities = localStorage.selectedCities;
-  // why doesnt this work aaaahhhhh
-  localforage.getItem('selectedCities').then(function(data){
+  //startup code here
+  localforage.getItem('selectedCities').then(function(data) {
     app.selectedCities = data;
     console.log("app.selectedCities: ")
     console.log(app.selectedCities)
 
-
-
-
-  if (app.selectedCities) {
-    // app.selectedCities = JSON.parse(app.selectedCities);
-    app.selectedCities.forEach(function(city) {
-      app.getForecast(city.key, city.label);
-    });
-  } else {
-    app.updateForecastCard(initialWeatherForecast)
-    app.selectedCities = [{
-      key: initialWeatherForecast.key,
-      label: initialWeatherForecast.label
-    }];
-    app.saveSelectedCities()
-  }
+    if (app.selectedCities) {
+      app.selectedCities.forEach(function(city) {
+        app.getForecast(city.key, city.label);
+      });
+    } else {
+      app.updateForecastCard(initialWeatherForecast)
+      app.selectedCities = [{
+        key: initialWeatherForecast.key,
+        label: initialWeatherForecast.label
+      }];
+      app.saveSelectedCities()
+    }
   });
 
-  // TODO add service worker code here
+  //service worker code here
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('./service-worker.js')
