@@ -1,7 +1,10 @@
-$(document).ready(function(){
+$(document).ready(function() {
 
-
-
+  if(navigator.onLine){
+    document.getElementById('network-indicator').textContent = 'YOU ARE CURRENTLY ONLINE';
+  } else if (!navigator.onLine){
+    document.getElementById('network-indicator').textContent = 'YOU ARE CURRENTLY OFFLINE';
+  }
 
   var app = {
     isLoading: true,
@@ -53,7 +56,14 @@ $(document).ready(function(){
       key: key,
       label: label
     })
-    
+
+    if (navigator.onLine) {
+      alert("USER IS ONLINE")
+    }
+
+    if (!navigator.onLine) {
+      alert("USER IS OFFLINE")
+    }
     app.saveSelectedCities()
     app.toggleAddDialog(false);
   });
@@ -183,17 +193,21 @@ $(document).ready(function(){
     }
 
     // Fetch the latest data.
-    $.getJSON(url, function(data){
-      console.log(data)
-      var dataToUpdate = data.query.results;
-      dataToUpdate.key = key;
-      dataToUpdate.label = label;
-      dataToUpdate.created = data.query.created;
-      console.log(dataToUpdate)
-      app.updateForecastCard(dataToUpdate);
-    })
-    .done(function(){console.log('get JSON done')})
-    .fail(function(){console.log('get JSON failed')})
+    $.getJSON(url, function(data) {
+        console.log(data)
+        var dataToUpdate = data.query.results;
+        dataToUpdate.key = key;
+        dataToUpdate.label = label;
+        dataToUpdate.created = data.query.created;
+        console.log(dataToUpdate)
+        app.updateForecastCard(dataToUpdate);
+      })
+      .done(function() {
+        console.log('get JSON done')
+      })
+      .fail(function() {
+        console.log('get JSON failed')
+      })
   };
 
 
@@ -371,6 +385,15 @@ $(document).ready(function(){
       });
   }
 
+
+
+  window.addEventListener('offline', function(e) {
+    document.getElementById('network-indicator').textContent = 'YOU ARE CURRENTLY OFFLINE';
+  });
+
+  window.addEventListener('online', function(e) {
+    document.getElementById('network-indicator').textContent = 'YOU ARE CURRENTLY ONLINE';
+  });
 
 
 });
