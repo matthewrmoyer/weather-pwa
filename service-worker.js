@@ -20,6 +20,8 @@ var filesToCache = [
   './images/wind.png'
   ];
 
+// INSTEAD OF CACHE.ADDALL USE CACHE.ADD  FOR EACH FILESTOCACHE FILE
+// install fires when you first visit the page
 self.addEventListener('install', function(e){
 	console.log('[ServiceWorker] Install');
 	e.waitUntil(
@@ -30,6 +32,7 @@ self.addEventListener('install', function(e){
 		);
 });
 
+// activate fires when the service woker starts up
 self.addEventListener('activate', function(e) {
   console.log('[ServiceWorker] Activate');
   e.waitUntil(
