@@ -41,7 +41,10 @@ self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keyList) {
       return Promise.all(keyList.map(function(key) {
+      	// this is checking if there is an old version of the app cached
         if (key !== cacheName && key !== dataCacheName) {
+        	 //if there is an old version delete it
+        	 //immediately before this step, there would be two different versions installed already 
           console.log('[ServiceWorker] Removing old cache', key);
           return caches.delete(key);
         }
