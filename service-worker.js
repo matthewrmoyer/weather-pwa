@@ -22,6 +22,7 @@ var filesToCache = [
 
 // INSTEAD OF CACHE.ADDALL USE CACHE.ADD  FOR EACH FILESTOCACHE FILE
 // install fires when you first visit the page
+// cache shell
 self.addEventListener('install', function(e){
 	console.log('[ServiceWorker] Install');
 	e.waitUntil(
