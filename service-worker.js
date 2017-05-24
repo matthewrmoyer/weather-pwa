@@ -1,4 +1,6 @@
+// application data
 var dataCacheName = 'weatherData-v1';
+// application shell
 var cacheName = 'weather PWA-step-6-1';
 var filesToCache = [
   '/',
@@ -59,11 +61,19 @@ self.addEventListener('fetch', function(e) {
      * network and then caches the response. This is called the "Cache then
      * network" strategy:
      * https://jakearchibald.com/2014/offline-cookbook/#cache-then-network
+     REMEMBER: THIS IS JUST ONE OF 2 REQUESTS BEING MADE
+     THIS IS THE REQUETS TO THE NETWORK
+     THERE IS ALSO A REQUEST BEING MADE TO THE CACHE
+     CHECK OUT APP.GETFORECAST TO SEE BOTH REQUESTS
      */
     e.respondWith(
+    	// open cache
       caches.open(dataCacheName).then(function(cache) {
+      	// get response from network
         return fetch(e.request).then(function(response){
+        	// clone response from network and save it in the cache
           cache.put(e.request.url, response.clone());
+          // return the response
           return response;
         });
       })

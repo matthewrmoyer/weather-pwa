@@ -169,7 +169,7 @@ $(document).ready(function() {
    * Gets a forecast for a specific city and updates the card with the data.
    * getForecast() first checks if the weather data is in the cache. If so,
    * then it gets that data and populates the card with the cached data.
-   * Then, getForecast() goes to the network for fresh data. If the network
+   * EITHER WAY THE NEXT STEP IS THAT getForecast() goes to the network for fresh data. If the network
    * request goes through, then the card gets updated a second time with the
    * freshest data.
    */
@@ -177,7 +177,7 @@ $(document).ready(function() {
     var statement = 'select * from weather.forecast where woeid=' + key;
     var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
       statement;
-    // TODO add cache logic here
+    //cache logic
     if ('caches' in window) {
       caches.match(url).then(function(response) {
         if (response) {
@@ -193,6 +193,7 @@ $(document).ready(function() {
     }
 
     // Fetch the latest data.
+    // this is intercepted by the service worker which caches the response
     $.getJSON(url, function(data) {
         console.log(data)
         var dataToUpdate = data.query.results;
